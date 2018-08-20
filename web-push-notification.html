@@ -1,0 +1,184 @@
+<script type="text/javascript">
+    RED.nodes.registerType('web-push-notification', {
+        category: 'PWA',
+        color: '#CCB2FF',
+        defaults: {
+            name: { value: "" },
+            title: { value: "" },
+            body: { value: "" },
+            sound: { value: "" },
+            payload: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "pwa_icon.png",
+        label: function () {
+            return this.name || "web push notification";
+        },
+        oneditprepare: function () {
+            var that = this;
+
+            function setupPayload() {
+                // create the editable list
+                $("#node-input-payload-container").css('min-height', '150px').editableList({
+                    addItem: function (container, i, opt) {
+                        if (!opt.hasOwnProperty("key")) {
+                            opt.key = "";
+                        }
+                        if (!opt.hasOwnProperty("value")) {
+                            opt.value = "";
+                        }
+                        if (!opt.hasOwnProperty("type")) {
+                            opt.type = "str";
+                        }
+
+                        // create row div
+                        var row = $('<div/>').appendTo(container);
+
+                        // create the key/value fields
+                        var keyField = $('<input/>', {
+                            class: "node-input-payload-key",
+                            type: "text",
+                            style: "margin-left: 5px; width: 30%"
+                        }).appendTo(row).typedInput({
+                            default: 'str',
+                            types: ['str']
+                        });
+
+                        var valueField = $('<input/>', {
+                            class: "node-input-payload-value",
+                            type: "text",
+                            style: "margin-left: 5px; width: 65%;"
+                        }).appendTo(row).typedInput({
+                            default: opt.type,
+                            types: ['str', 'num', 'bool', 'json']
+                        });
+
+                        // set the value
+                        keyField.typedInput("value", opt.key)
+                        valueField.typedInput("value", opt.value)
+
+                    },
+                    sortable: true,
+                    removable: true
+                })
+
+                // show/hide the payload editable list
+                function updatePayloadOptions() {
+                    if ($("#use-payload").is(':checked')) {
+                        $("#node-row-payload").show();
+                    } else {
+                        $("#node-row-payload").hide();
+                    }
+                }
+                $("#use-payload").prop("checked", that.payload.length > 0);
+                updatePayloadOptions();
+
+                // show/hide on checkbox click
+                $("#use-payload").on("click", function () {
+                    updatePayloadOptions();
+                });
+
+                // add existing values
+                try {
+                    var payload = JSON.parse(that.payload);
+
+                    for (var i = 0; i < payload.length; i++) {
+                        var opt = payload[i];
+                        $("#node-input-payload-container").editableList('addItem', opt);
+                    }
+                } catch (err) { }
+            } // -- setupPayload
+            setupPayload()
+
+        },
+        oneditsave: function () {
+
+            // save the payload
+            var payload = [];
+            if ($("#use-payload").is(':checked')) {
+                var payloadItems = $("#node-input-payload-container").editableList('items');
+                payloadItems.each(function (i) {
+                    var key = $(this).find(".node-input-payload-key").typedInput("value");
+                    var value = $(this).find(".node-input-payload-value").typedInput("value");
+                    var type = $(this).find(".node-input-payload-value").typedInput("type");
+
+                    var opt = {
+                        key: key,
+                        value: value,
+                        type: type
+                    }
+
+                    payload.push(opt);
+                })
+            }
+            if (payload.length > 0) {
+                $("#node-input-payload").val(JSON.stringify(payload));
+            } else {
+                $("#node-input-payload").val(null);
+            }
+        }
+    });
+
+</script>
+
+<script type="text/x-red" data-template-name="web-push-notification">
+
+    <!--Title-->
+    <div class="form-row">
+        <label for="node-input-title"><i class="fa fa-header"></i> Title</label>
+        <input type="text" id="node-input-title">
+    </div>
+
+    <!--Message text-->
+    <div class="form-row">
+        <label for="node-input-body"><i class="fa fa-comment"></i> Text</label>
+        <input type="text" id="node-input-body">
+    </div>
+
+    <!--Sound-->
+    <div class="form-row">
+        <label for="node-input-sound"><i class="fa fa-volume-up"></i> Sound</label>
+        <select type="text" id="node-input-sound">
+            <option value="">Disabled</option>
+            <option value="default">Enabled</option>
+        </select>
+    </div>
+
+    <!--Payload-->
+    <div class="form-row">
+        <input type="checkbox" id="use-payload" class="checkbox-input">
+        <label for="use-payload" style="width: auto"> Payload</label>
+        <input type="hidden" id="node-input-payload">
+
+        <div id="node-row-payload" class="form-row node-input-payload-container-row hide">
+            <ol id="node-input-payload-container"></ol>
+        </div>
+    </div>
+
+    <!--Name-->
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<style>
+    #node-input-sound {
+        width: 100px;
+    }
+    
+    .checkbox-input {
+        display: inline-block !important;
+        width: auto !important;
+        vertical-align: top !important;
+    }
+    
+    .checkbox-label {
+        width: auto !important;
+    }
+</style>
+
+<script type="text/x-red" data-help-name="web-push-notification">
+    <p>A notification node which holds all the Web Push notification properties.</p>
+</script>

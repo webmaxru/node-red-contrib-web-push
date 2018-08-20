@@ -1,0 +1,53 @@
+<script type="text/javascript">
+    RED.nodes.registerType('web-push', {
+        category: 'PWA',
+        color: '#CCB2FF',
+        defaults: {
+            name: { value: "" },
+            vapidConfiguration: { value: "", type: "vapid-configuration", required: false }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "pwa_icon.png",
+        label: function () {
+            return this.name || "web push";
+        }
+    });
+
+</script>
+
+<script type="text/x-red" data-template-name="web-push">
+    <div class="form-row">
+        <label for="node-input-vapidConfiguration"><i class="fa fa-cog"></i> Vapid Configuration</label>
+        <input type="text" id="node-input-vapidConfiguration">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="web-push">
+    <p>Node for sending Web Push notifications using standard <a href="https://tools.ietf.org/html/draft-ietf-webpush-protocol" target="_blank">Web Push Protocol</a> and sender authentication using <a href="https://tools.ietf.org/html/draft-thomson-webpush-vapid" target="_blank">VAPID</a></p>
+    <p>You can use a <code>web-push-notification</code> node or you can manually set the notification properties in the <code>msg.notification</code> object.</p>
+    <p>For a list of supported browsers, as well as more information, take a look at the <a href="https://github.com/web-push-libs/web-push" target="_blank">web-push</a> page and also <a href="https://jakearchibald.github.io/isserviceworkerready/" target="_blank">here</a>.</p>
+    <p>The subscriptions must be provided in the <code>msg.subscriptions</code> object and they must contain the endpoint, as well as the p256dh and the auth keys.</p>
+    <p>E.g.:</p>
+    <pre>msg.subscriptions = [
+    {
+        endpoint: "https://fcm.googleapis.com/fcm/send/&lt;SOME_LONG_TOKEN&gt;",
+        keys: {
+            p256dh: "&lt;P256DH_KEY&gt;",
+            auth: "&lt;AUTH_KEY&gt;"
+        }
+    },
+    {
+        endpoint: "https://updates.push.services.mozilla.com/wpush/v1/&lt;SOME_LONG_TOKEN&gt;",
+        keys: {
+            p256dh: "&lt;P256DH_KEY&gt;",
+            auth: "&lt;AUTH_KEY&gt;"
+        }
+    }
+]</pre>
+    <p>The result is returned in <code>msg.payload</code>.</p>
+</script>

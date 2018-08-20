@@ -1,0 +1,44 @@
+<script type="text/javascript">
+    RED.nodes.registerType('vapid-configuration', {
+        category: 'config',
+        defaults: {
+            subject: { value: "", required: true },
+            publicKey: { value: "", required: true },
+            privateKey: { value: "", required: true },
+            gcmApiKey: { value: "" },
+            name: { value: "" }
+        },
+        label: function () {
+            return this.name || this.subject;
+        }
+    });
+
+</script>
+
+<script type="text/x-red" data-template-name="vapid-configuration">
+    <div class="form-row">
+        <label for="node-config-input-subject"><i class="icon-tag"></i> Subject</label>
+        <input type="text" id="node-config-input-subject" placeholder="This must be either a URL or a 'mailto:' address.">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-publicKey"><i class="icon-tag"></i> Public Key</label>
+        <input type="text" id="node-config-input-publicKey" placeholder="The public VAPID key">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-privateKey"><i class="icon-tag"></i> Private Key</label>
+        <input type="text" id="node-config-input-privateKey" placeholder="The public VAPID key">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-gcmApiKey"><i class="icon-tag"></i> GCM API Key (for older browsers)</label>
+        <input type="text" id="node-config-input-gcmApiKey" placeholder="The API key to send with the GCM request">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="vapid-configuration">
+    <p>Configuration for VAPID. You can generate the key pair using <code>generateVAPIDKeys()</code> method of <a href="https://www.npmjs.com/package/web-push" target="_blank">web-push</a> library or online here: <a href="https://web-push-codelab.glitch.me/" target="_blank">https://web-push-codelab.glitch.me</a>.</p>
+    <p>For Chrome prior to version 52 and some old browsers, you're also still required to include a <code>gcm_sender_id</code> in your web app's manifest.json.</p>
+</script>

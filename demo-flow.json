@@ -1,0 +1,173 @@
+[
+  {
+    "id": "186ee9b7.78e426",
+    "type": "tab",
+    "label": "Web Push Demo",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "1d41b598.c12dba",
+    "type": "vapid-configuration",
+    "z": "",
+    "subject": "mailto:salnikov@gmail.com",
+    "publicKey": "BM88mSlUg4mvjcPK5QrzRfQzow91F47iEazCnoTBQ8Hv_AVrJviLcnrNumTK319qWOt43sgOzBJs6UrdOW5IxHg",
+    "privateKey": "81iA43m6lKOtT0p8FYEh_WXfcNZW2X6Hs3S_FfBxKY4",
+    "gcmApiKey": "",
+    "name": ""
+  },
+  {
+    "id": "c0a453e0.3b0b",
+    "type": "web-push",
+    "z": "186ee9b7.78e426",
+    "name": "",
+    "vapidConfiguration": "1d41b598.c12dba",
+    "x": 740,
+    "y": 280,
+    "wires": [["dacfb716.62dd98"]]
+  },
+  {
+    "id": "55f7d1e7.59fe4",
+    "type": "web-push-notification",
+    "z": "186ee9b7.78e426",
+    "name": "web push notification",
+    "title": "This is default notification",
+    "body": "It makes sense to have a call to action in the content",
+    "sound": "",
+    "payload": "",
+    "x": 420,
+    "y": 200,
+    "wires": [["9b93fae9.81c4d8"]]
+  },
+  {
+    "id": "772803c2.55b3cc",
+    "type": "inject",
+    "z": "186ee9b7.78e426",
+    "name": "Send predefined notification",
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "x": 160,
+    "y": 200,
+    "wires": [["55f7d1e7.59fe4"]]
+  },
+  {
+    "id": "dacfb716.62dd98",
+    "type": "debug",
+    "z": "186ee9b7.78e426",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "x": 750,
+    "y": 340,
+    "wires": []
+  },
+  {
+    "id": "1512b37d.10daed",
+    "type": "http in",
+    "z": "186ee9b7.78e426",
+    "name": "Demo Web Push Manager REST API",
+    "url": "webpush",
+    "method": "post",
+    "upload": false,
+    "swaggerDoc": "",
+    "x": 180,
+    "y": 60,
+    "wires": [["c1013cfe.39645"]]
+  },
+  {
+    "id": "c1013cfe.39645",
+    "type": "function",
+    "z": "186ee9b7.78e426",
+    "name": "Demo Web Push Manager",
+    "func": "let pushSubscriptions = flow.get('pushSubscriptions')||[]\n  \nlet action = msg.payload.action\nlet subscription = msg.payload.subscription\n  \nlet result = ''\n\nlet foundSubscriptionItems = pushSubscriptions.filter( subscriptionItem => {\n    return subscriptionItem.endpoint == subscription.endpoint\n})\n  \nif (action === 'subscribe') {\n    \n    if (foundSubscriptionItems.length === 0) {\n      pushSubscriptions.push(subscription)\n      result = 'Subscription registered: ' + subscription.endpoint\n    } else {\n      result = 'Subscription was already registered: ' + subscription.endpoint\n    }\n\n    msg.statusCode = 200\n    \n } else if (action === 'unsubscribe') {\n     \n    if(foundSubscriptionItems.length === 0) {\n        result = 'Subscription was not found: ' + subscription.endpoint\n    } else {\n        pushSubscriptions = pushSubscriptions.filter(subscriptionItem => {\n            return subscriptionItem.endpoint !== subscription.endpoint\n        })\n        result = 'Subscription unregistered: ' + subscription.endpoint\n    }\n    \n    msg.statusCode = 200\n\n } else {\n      \n    result = 'Unsupported action'\n      \n    msg.statusCode = 400\n    \n }\n  \nmsg.payload = {\n  result: result\n}\n\nnode.log(`Number of active subscriptions: ${pushSubscriptions.length}`)\n    \nflow.set('pushSubscriptions', pushSubscriptions)\n  \nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 480,
+    "y": 60,
+    "wires": [["af876fe8.30ed6", "f0b8d2a9.8a765"]]
+  },
+  {
+    "id": "af876fe8.30ed6",
+    "type": "http response",
+    "z": "186ee9b7.78e426",
+    "name": "API Response",
+    "statusCode": "",
+    "headers": {},
+    "x": 760,
+    "y": 60,
+    "wires": []
+  },
+  {
+    "id": "f0b8d2a9.8a765",
+    "type": "debug",
+    "z": "186ee9b7.78e426",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "x": 750,
+    "y": 120,
+    "wires": []
+  },
+  {
+    "id": "cdb680f9.fdbe5",
+    "type": "inject",
+    "z": "186ee9b7.78e426",
+    "name": "Send custom notifcation",
+    "topic": "",
+    "payload": "{\"notification\":{\"title\":\"This is custom notification\",\"body\":\"It makes sense to have a call to action in the content\"}}",
+    "payloadType": "json",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "x": 150,
+    "y": 380,
+    "wires": [["71ee5e9.d465ea"]]
+  },
+  {
+    "id": "71ee5e9.d465ea",
+    "type": "change",
+    "z": "186ee9b7.78e426",
+    "name": "Set msg.notification",
+    "rules": [
+      {
+        "t": "set",
+        "p": "notification",
+        "pt": "msg",
+        "to": "payload",
+        "tot": "msg"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 420,
+    "y": 380,
+    "wires": [["9b93fae9.81c4d8"]]
+  },
+  {
+    "id": "9b93fae9.81c4d8",
+    "type": "function",
+    "z": "186ee9b7.78e426",
+    "name": "List subscriptions",
+    "func": "// Using Flow variable we set in Demo Web Push Manager API\nmsg.subscriptions = flow.get('pushSubscriptions')||[]\n\n/*\nor list your subscription objects manually:\nmsg.subscriptions = [{\n    endpoint: \"https://fcm.googleapis.com/fcm/send/SOME_LONG_TOKEN\",\n    keys:\n    {\n        p256dh: P256DH_KEY\",\n        auth: \"AUTH_KEY\"\n    }\n}]\n*/\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 530,
+    "y": 280,
+    "wires": [["c0a453e0.3b0b"]]
+  }
+]
