@@ -16,19 +16,16 @@ module.exports = function (RED) {
 
         let options
         if (node.vapidConfiguration) {
-          // Get the secure keys from the VAPID configuration credentials
-          var keys = node.vapidConfiguration.getKeys();
-          
           options = {
             vapidDetails: {
               subject: node.vapidConfiguration.subject,
-              publicKey: keys.publicKey,
-              privateKey: keys.privateKey
+              publicKey: node.vapidConfiguration.publicKey,
+              privateKey: node.vapidConfiguration.privateKey
             }
           }
 
-          if (keys.gcmApiKey) {
-            options['gcmAPIKey'] = keys.gcmApiKey
+          if (node.vapidConfiguration.gcmApiKey) {
+            options['gcmAPIKey'] = node.vapidConfiguration.gcmApiKey
           }
         }
 
