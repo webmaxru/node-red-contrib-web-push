@@ -3,63 +3,13 @@
         category: 'config',
         defaults: {
             subject: { value: "", required: true },
-            // The below 3 key fields are not used anymore (i.e. replaced by credentials) but we cannot
-            // remove them here, otherwise the keys of old existing nodes would be lost ...
-            publicKey: { value: ""},
-            privateKey: { value: ""},
+            publicKey: { value: "", required: true },
+            privateKey: { value: "", required: true },
             gcmApiKey: { value: "" },
             name: { value: "" }
         },
-        credentials: {
-            // TODO how make credentials required??
-            publicKey2: {type:"password"},
-            privateKey2: {type: "password"},
-            gcmApiKey2: {type:"password"}
-        },
         label: function () {
             return this.name || this.subject;
-        },
-        oneditprepare: function () {
-            var node = this;
-            
-            // For old nodes (without credentials), the (unsecure) keys should be converted to credentials.  Some remarks:
-            // - The old html screen elements should remain available, in order to keep the old node values.
-            // - The new keys have postfix '2', otherwise Node-RED binds the html screen element to both old and new node fields.
-            // - We will manipulate the html screen element values, so Node-RED will automatically sync the node values (at 'Done' or 'Cancel').
-            if (node.publicKey) {
-                $('#node-config-input-publicKey').val("");
-                $('#node-config-input-publicKey2').val(node.publicKey);
-            }
-            if (node.privateKey) {
-                $('#node-config-input-privateKey').val("");
-                $('#node-config-input-privateKey2').val(node.privateKey);
-            }
-            if (node.gcmApiKey) {
-                $('#node-config-input-gcmApiKey').val("");
-                $('#node-config-input-gcmApiKey2').val(node.gcmApiKey);
-            }
-        
-            $("#node-input-generateKeyPair").click(function () {
-                if ($("#node-config-input-publicKey2").val() || $("#node-config-input-privateKey2").val()) {
-                    if (!confirm("The current keypair will be overwritten!  Are you sure to continue?")) {
-                        // The user has clicked the 'Cancel' button
-                        return;
-                    }
-                }
-                
-                // Ask the server side flow to generate a new key pair
-                $.getJSON('vapid_configuration/generate_key_pair', function(jsonData) {
-                    // Show the new keys on the config screen
-                    $("#node-config-input-publicKey2").val(jsonData.publicKey);
-                    $("#node-config-input-privateKey2").val(jsonData.privateKey);
-                    
-                    // Make sure the validators are being triggerd, otherwise the red border will remain around the input fields
-                    $("#node-config-input-publicKey2").change();
-                    $("#node-config-input-privateKey2").change();
-                }).error(function() {
-                    RED.notify("Cannot create VAPID key pair.  See Node-RED log for more details...", "error");
-                });
-            });
         }
     });
 
@@ -71,26 +21,16 @@
         <input type="text" id="node-config-input-subject" placeholder="This must be either a URL or a 'mailto:' address.">
     </div>
     <div class="form-row">
-        <label>&nbsp;</label>
-        <button id="node-input-generateKeyPair"><i class="fa fa-exchange"></i> Generate VAPID keypair</button>
-    </div>
-    <div class="form-row" hidden>
-        <!-- Unused hidden fields to bind the old (unsecure) keys in the node instance -->
-        <input type="text" id="node-config-input-publicKey">
-        <input type="text" id="node-config-input-privateKey">
-        <input type="text" id="node-config-input-gcmApiKey">
+        <label for="node-config-input-publicKey"><i class="icon-tag"></i> Public Key</label>
+        <input type="text" id="node-config-input-publicKey" placeholder="The public VAPID key">
     </div>
     <div class="form-row">
-        <label for="node-config-input-publicKey2"><i class="icon-tag"></i> Public Key</label>
-        <input type="password" id="node-config-input-publicKey2">
+        <label for="node-config-input-privateKey"><i class="icon-tag"></i> Private Key</label>
+        <input type="text" id="node-config-input-privateKey" placeholder="The public VAPID key">
     </div>
     <div class="form-row">
-        <label for="node-config-input-privateKey2"><i class="icon-tag"></i> Private Key</label>
-        <input type="password" id="node-config-input-privateKey2">
-    </div>
-    <div class="form-row">
-        <label for="node-config-input-gcmApiKey2"><i class="icon-tag"></i> GCM API Key (for older browsers)</label>
-        <input type="password" id="node-config-input-gcmApiKey2">
+        <label for="node-config-input-gcmApiKey"><i class="icon-tag"></i> GCM API Key (for older browsers)</label>
+        <input type="text" id="node-config-input-gcmApiKey" placeholder="The API key to send with the GCM request">
     </div>
     <div class="form-row">
         <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
