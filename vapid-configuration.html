@@ -10,6 +10,31 @@
         },
         label: function () {
             return this.name || this.subject;
+        },
+        oneditprepare: function () {
+            var node = this;
+            
+            $("#node-input-generateKeyPair").click(function () {
+                if ($("#node-config-input-publicKey").val() || $("#node-config-input-privateKey").val()) {
+                    if (!confirm("The current keypair will be overwritten!  Are you sure to continue?")) {
+                        // The user has clicked the 'Cancel' button
+                        return;
+                    }
+                }
+                
+                // Ask the server side flow to generate a new key pair
+                $.getJSON('vapid_configuration/generate_key_pair', function(jsonData) {
+                    // Show the new keys on the config screen
+                    $("#node-config-input-publicKey").val(jsonData.publicKey);
+                    $("#node-config-input-privateKey").val(jsonData.privateKey);
+                    
+                    // Make sure the validators are being triggerd, otherwise the red border will remain around the input fields
+                    $("#node-config-input-publicKey").change();
+                    $("#node-config-input-privateKey").change();
+                }).error(function() {
+                    RED.notify("Cannot create VAPID key pair.  See Node-RED log for more details...", "error");
+                });
+            });
         }
     });
 
@@ -19,6 +44,10 @@
     <div class="form-row">
         <label for="node-config-input-subject"><i class="icon-tag"></i> Subject</label>
         <input type="text" id="node-config-input-subject" placeholder="This must be either a URL or a 'mailto:' address.">
+    </div>
+    <div class="form-row">
+        <label>&nbsp;</label>
+        <button id="node-input-generateKeyPair"><i class="fa fa-exchange"></i> Generate VAPID keypair</button>
     </div>
     <div class="form-row">
         <label for="node-config-input-publicKey"><i class="icon-tag"></i> Public Key</label>
@@ -39,6 +68,9 @@
 </script>
 
 <script type="text/x-red" data-help-name="vapid-configuration">
-    <p>Configuration for VAPID. You can generate the key pair using <code>generateVAPIDKeys()</code> method of <a href="https://www.npmjs.com/package/web-push" target="_blank">web-push</a> library or online here: <a href="https://web-push-codelab.glitch.me/" target="_blank">https://web-push-codelab.glitch.me</a>.</p>
+    <p>Configuration for VAPID. You can generate the key pair using the <i>"Generate VAPID keypair"</i> button or online here: <a href="https://web-push-codelab.glitch.me/" target="_blank">https://web-push-codelab.glitch.me</a>.</p>
+    <p>Read more about the VAPID specification here: <a href="https://tools.ietf.org/html/rfc8292" target="_blank">https://tools.ietf.org/html/rfc8292</a>.</p>
     <p>For Chrome prior to version 52 and some old browsers, you're also still required to include a <code>gcm_sender_id</code> in your web app's manifest.json.</p>
 </script>
+
+
