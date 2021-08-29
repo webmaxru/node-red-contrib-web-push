@@ -41,6 +41,25 @@ module.exports = function (RED) {
                   }
                 })
               }).catch((err) => {
+                // When a standard error text has been received, make sure it is converted to mimic a WebPushError object.
+                // Otherwise it has no 'failed' property, so it will be considered no failure further on ...
+                if (err instanceof Error) {
+                  err = {
+                    failed: {
+                      name: err.name,
+                      message: "Standard exception",
+                      body: err.message
+                    }
+                  }
+                }
+                
+                // Remove some properties from the WebPushError to make sure the logs only contain useful information
+                delete err.failed.headers
+                delete err.failed.endpoint
+
+                // Log the error message to simplify troubleshooting
+                node.error(JSON.stringify(err.failed))
+
                 resolve({
                   failed: JSON.parse(JSON.stringify(err))
                 })
