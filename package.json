@@ -4,7 +4,7 @@
     "email": "salnikov@gmail.com"
   },
   "dependencies": {
-    "web-push": "3.3.2"
+    "web-push": "^3.4.5"
   },
   "description": "Web Push notifications for Node-RED",
   "keywords": [

@@ -27,6 +27,11 @@ module.exports = function (RED) {
           if (node.vapidConfiguration.gcmApiKey) {
             options['gcmAPIKey'] = node.vapidConfiguration.gcmApiKey
           }
+          
+          // Only apply the timeout when it is specified and greater than zero
+          if (node.vapidConfiguration.timeout && node.vapidConfiguration.timeout > 0) {
+            options['timeout'] = node.vapidConfiguration.timeout
+          }
         }
 
         if (msg.subscriptions && msg.subscriptions.length > 0) {

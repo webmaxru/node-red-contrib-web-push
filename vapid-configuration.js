@@ -1,14 +1,4 @@
 module.exports = function (RED) {
-  function VapidConfigurationNode (config) {
-    RED.nodes.createNode(this, config)
-    this.subject = config.subject
-    this.publicKey = config.publicKey
-    this.privateKey = config.privateKey
-    this.gcmApiKey = config.gcmApiKey
-  }
-  RED.nodes.registerType('vapid-configuration', VapidConfigurationNode)
-}
-module.exports = function (RED) {
   const webpush = require('web-push');
     
   function VapidConfigurationNode (config) {
@@ -17,6 +7,12 @@ module.exports = function (RED) {
     this.publicKey = config.publicKey
     this.privateKey = config.privateKey
     this.gcmApiKey = config.gcmApiKey
+    this.timeout = config.timeout
+    
+    // Older nodes (version 0.0.3 and below) have no timeout option, so set it to 0 (= no custom timeout)
+    if (this.timeout == undefined) {
+      this.timeout = 0;
+    }
   }
   RED.nodes.registerType('vapid-configuration', VapidConfigurationNode)
   
