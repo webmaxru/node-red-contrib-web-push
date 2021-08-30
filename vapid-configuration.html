@@ -6,6 +6,7 @@
             publicKey: { value: "", required: true },
             privateKey: { value: "", required: true },
             gcmApiKey: { value: "" },
+            timeout: { value: 0 },
             name: { value: "" }
         },
         label: function () {
@@ -13,6 +14,11 @@
         },
         oneditprepare: function () {
             var node = this;
+
+            // Older nodes (version 0.0.3 and below) have no timeout option, so set it to 0 (= no custom timeout)
+            if (this.timeout == undefined) {
+                $('#node-config-input-timeout').val(0);
+            }
             
             $("#node-input-generateKeyPair").click(function () {
                 if ($("#node-config-input-publicKey").val() || $("#node-config-input-privateKey").val()) {
@@ -62,6 +68,10 @@
         <input type="text" id="node-config-input-gcmApiKey" placeholder="The API key to send with the GCM request">
     </div>
     <div class="form-row">
+        <label for="node-config-input-timeout"><i class="icon-tag"></i> Timeout</label>
+        <input type="number" id="node-config-input-timeout">
+    </div>
+    <div class="form-row">
         <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-config-input-name" placeholder="Name">
     </div>
@@ -71,6 +81,7 @@
     <p>Configuration for VAPID. You can generate the key pair using the <i>"Generate VAPID keypair"</i> button or online here: <a href="https://web-push-codelab.glitch.me/" target="_blank">https://web-push-codelab.glitch.me</a>.</p>
     <p>Read more about the VAPID specification here: <a href="https://tools.ietf.org/html/rfc8292" target="_blank">https://tools.ietf.org/html/rfc8292</a>.</p>
     <p>For Chrome prior to version 52 and some old browsers, you're also still required to include a <code>gcm_sender_id</code> in your web app's manifest.json.</p>
+    <p>Optionally a timeout can be specified (in milliseconds).  A timeout value of 0 is considered as no timeout.</p>
 </script>
 
 
