@@ -14,10 +14,10 @@
         },
         oneditprepare: function () {
             var node = this;
-            
+            debugger;
             // Older nodes (version 0.0.3 and below) have no timeout option, so set it to 0 (= no custom timeout)
             if (this.timeout == undefined) {
-                this.timeout = 0;
+                $('#node-config-input-timeout').val(0);
             }
             
             $("#node-input-generateKeyPair").click(function () {
@@ -69,7 +69,7 @@
     </div>
     <div class="form-row">
         <label for="node-config-input-timeout"><i class="icon-tag"></i> Timeout</label>
-        <input type="text" id="node-config-input-timeout">
+        <input type="number" id="node-config-input-timeout">
     </div>
     <div class="form-row">
         <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
